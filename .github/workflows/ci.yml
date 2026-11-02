@@ -1,0 +1,39 @@
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - name: Firebase emulator integration tests
+        env:
+          FIREBASE_PROJECT_ID: ticket-maestro-local
+          NODE_ENV: test
+        run: pnpm exec firebase emulators:exec --project ticket-maestro-local --only auth,firestore "pnpm test:integration"
+      - run: pnpm build
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - name: Validate Docker image build
+        run: docker build --tag ticket-maestro-ci --build-arg VITE_FIREBASE_AUTH_EMULATOR_URL= .

@@ -1,0 +1,48 @@
+{
+  "name": "ticket-maestro",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:services": "concurrently -k -n api,web -c blue,green \"pnpm --filter @ticket-maestro/api dev\" \"pnpm --filter @ticket-maestro/web dev\"",
+    "emulators": "firebase emulators:start --only auth,firestore --project ticket-maestro-local",
+    "seed": "pnpm --filter @ticket-maestro/shared build && pnpm --filter @ticket-maestro/api seed",
+    "seed:load-users": "pnpm --filter @ticket-maestro/shared build && pnpm --filter @ticket-maestro/api seed -- --load-users=500",
+    "seed:large": "pnpm --filter @ticket-maestro/shared build && pnpm --filter @ticket-maestro/api seed -- --large",
+    "reset:oversale": "pnpm --filter @ticket-maestro/api exec tsx src/scripts/reset-oversale.ts",
+    "worker:email": "pnpm --filter @ticket-maestro/api worker:email",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm --filter @ticket-maestro/shared build && pnpm -r typecheck",
+    "test": "pnpm --filter @ticket-maestro/shared build && pnpm -r test",
+    "test:e2e": "playwright test",
+    "test:integration": "pnpm --filter @ticket-maestro/shared build && pnpm --filter @ticket-maestro/api test:integration",
+    "format": "prettier --write .",
+    "perf:load": "k6 run tests/performance/k6/load.js",
+    "perf:stress": "k6 run tests/performance/k6/stress.js",
+    "perf:spike": "k6 run tests/performance/k6/spike.js",
+    "perf:oversale": "k6 run tests/performance/k6/oversale.js",
+    "perf:soak": "k6 run tests/performance/k6/soak.js",
+    "perf:multi-event": "k6 run tests/performance/k6/multi-event.js",
+    "perf:failure": "k6 run tests/performance/k6/failure.js",
+    "perf:purchase": "k6 run tests/performance/k6/purchase.js",
+    "perf:jmeter": "tests/performance/jmeter/run-jmeter.sh"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.56.1",
+    "concurrently": "^9.2.1",
+    "eslint": "^10.13.0",
+    "firebase-tools": "^15.34.1",
+    "globals": "^17.13.0",
+    "prettier": "^3.6.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.0",
+    "vitest": "^3.2.4"
+  }
+}

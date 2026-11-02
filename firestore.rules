@@ -1,0 +1,7 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // All application reads and writes go through the authenticated backend.
+    match /{document=**} { allow read, write: if false; }
+  }
+}

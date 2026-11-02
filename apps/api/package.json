@@ -1,0 +1,43 @@
+{
+  "name": "@ticket-maestro/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "lint": "eslint src tests",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run --passWithNoTests",
+    "test:integration": "vitest run tests/integration",
+    "worker:email": "tsx src/scripts/email-worker.ts",
+    "seed": "tsx src/scripts/seed.ts"
+  },
+  "dependencies": {
+    "@google-cloud/tasks": "^7.3.0",
+    "@ticket-maestro/shared": "workspace:*",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "firebase-admin": "^13.5.0",
+    "google-auth-library": "^11.3.1",
+    "helmet": "^8.1.0",
+    "nodemailer": "^7.0.10",
+    "pino": "^9.13.0",
+    "pino-http": "^10.5.0",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.9.2",
+    "@types/nodemailer": "^7.0.3",
+    "@types/supertest": "^6.0.3",
+    "supertest": "^7.1.4",
+    "tsx": "^4.20.6"
+  }
+}

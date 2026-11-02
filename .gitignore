@@ -4,6 +4,7 @@ node_modules
 # Build output
 dist
 dist-ssr
+*.tsbuildinfo
 
 # Test / coverage artifacts
 coverage
@@ -45,3 +46,10 @@ CLAUDE.md
 # Temporary scripts
 scripts/_tmp_*
 tmp/
+
+# Emulator diagnostics and generated performance reports
+firebase-debug.log
+ui-debug.log
+tests/performance/results/*.json
+tests/performance/results/*.jtl
+tests/performance/results/jmeter-*/

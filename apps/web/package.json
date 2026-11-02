@@ -1,0 +1,23 @@
+{
+  "name": "@ticket-maestro/web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "vite --host 0.0.0.0", "build": "tsc --noEmit -p tsconfig.json && vite build", "preview": "vite preview --host 0.0.0.0", "lint": "eslint src", "typecheck": "tsc --noEmit -p tsconfig.json", "test": "vitest run --passWithNoTests" },
+  "dependencies": {
+    "@ticket-maestro/shared": "workspace:*",
+    "@tanstack/react-query": "^5.90.2",
+    "firebase": "^12.5.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.16",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^5.0.4",
+    "tailwindcss": "^4.1.16",
+    "vite": "^7.1.12"
+  }
+}

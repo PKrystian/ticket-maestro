@@ -1,0 +1,82 @@
+services:
+  emulators:
+    build:
+      context: .
+      dockerfile: Dockerfile.emulator
+    ports:
+      - "9099:9099"
+      - "8081:8081"
+      - "4000:4000"
+    volumes:
+      - firebase_data:/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "Promise.all([9099,8081].map(p=>fetch('http://127.0.0.1:'+p).then(r=>{if(r.status>=500)throw Error()}))).then(()=>process.exit(0)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 4s
+      retries: 24
+      start_period: 40s
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+  seed:
+    build: .
+    environment:
+      NODE_ENV: development
+      FIREBASE_PROJECT_ID: ticket-maestro-local
+      FIREBASE_AUTH_EMULATOR_HOST: emulators:9099
+      FIRESTORE_EMULATOR_HOST: emulators:8081
+    command: ["node", "apps/api/dist/scripts/seed.js"]
+    depends_on:
+      emulators:
+        condition: service_healthy
+    restart: "no"
+  email-worker:
+    build: .
+    environment:
+      NODE_ENV: development
+      FIREBASE_PROJECT_ID: ticket-maestro-local
+      FIREBASE_AUTH_EMULATOR_HOST: emulators:9099
+      FIRESTORE_EMULATOR_HOST: emulators:8081
+      EMAIL_MODE: smtp
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      SMTP_FROM: tickets@ticketmaestro.local
+    command: ["node", "apps/api/dist/scripts/email-worker.js"]
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+      mailpit:
+        condition: service_started
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      NODE_ENV: development
+      PORT: 8080
+      WEB_ORIGIN: http://localhost:8080
+      FIREBASE_PROJECT_ID: ticket-maestro-local
+      FIREBASE_AUTH_EMULATOR_HOST: emulators:9099
+      FIRESTORE_EMULATOR_HOST: emulators:8081
+      ENABLE_FAILURE_INJECTION: "true"
+      EMAIL_MODE: smtp
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      SMTP_FROM: tickets@ticketmaestro.local
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+      email-worker:
+        condition: service_started
+      mailpit:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 4s
+      retries: 5
+      start_period: 10s
+volumes:
+  firebase_data:
